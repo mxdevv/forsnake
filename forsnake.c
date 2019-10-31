@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include <termios.h>
 #include <time.h>
 
@@ -16,19 +17,26 @@ main(void)
       tcsetattr(STDIN_FILENO, TCSANOW, &termc),
       srand(time(0)),
       printf("\e[%d;%dH", 1, 1),
-      c = 0
+      c = 1,
+      s = 36
     ;
       ++t
-      | (putchar(map[t] + 48) | (((t % 8) == 7) && putchar('\n')))
+      | (putchar(map[t % 64] + 48) | (((t % 8) == 7) && putchar('\n')))
       | (((t % 64) == 63) &&
-          (t = -1 | printf("\e[%d;%dH", 1, 1)
-              | sleep(1))
+          (printf("\e[%d;%dH", 1, 1)
+              | (map[s] == -1 && c++)
+              | (map[s] = c)
+              | (v == 'a' && (s -= 1))
+              | (v == 'w' && (s -= 8))
+              | (v == 'd' && (s += 1))
+              | (v == 's' && (s += 8))
+              | (scanf("%lc", &v))
           )
+        )
+      | ((t % 640) == 639 &&
+          (map[rand() % 64] = -1)
+        )
     ;
-
+      (map[t % 64] > 0 && map[t % 64]--)
   );
-
-  /*sleep(1);*/
-
-  tcsetattr(STDIN_FILENO, TCSANOW, &termd);
 }
